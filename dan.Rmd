@@ -1,0 +1,67 @@
+---
+title: "dan"
+author: "Daniel Kerstan"
+date: "4/10/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Packages
+```{r}
+# Load packages
+library(tidyverse)
+library(here)
+```
+
+
+```{r}
+data <- read.table(file = here("data", "clim.txt"), sep = "")
+
+data_annual <- data %>%
+  group_by(month, year) %>% 
+  summarize(total_precip = sum(precip), min_temp = mean(tmin_c))
+
+data_feb <- data_annual %>% filter(month == 2)
+data_jan <- data_annual %>% filter(month == 1)
+```
+
+Code your function in R; save it as a separate file called “the name of your function”.R; Make sure you include documentation Store your R function in a git repository - you will need it again for future assignment
+```{r}
+# Model parameters 
+almond_model <- function(monthly_temp, monthly_precip, temp_param_1 = -0.015, temp_param_2 = -0.0046, precip_param_1 = -0.07, precip_param_2 = 0.0043, constant = 0.28) {
+  
+# Model function
+yield_anomaly <- (temp_param_1*monthly_temp + temp_param_2*monthly_temp^2 + precip_param_1*monthly_precip + precip_param_2*monthly_precip^2 + constant)
+
+return(yield_anomaly)
+}
+  
+```
+
+```{r}
+yield_anom <- data.frame("year" = unique(data_annual$year)) %>% mutate(anomaly = NA)
+
+for (i in 1:length(yield_anom$year)) {
+  anom <- almond_model(monthly_temp = data_feb$min_temp[i], monthly_precip = data_jan$total_precip[i])
+  yield_anom$anomaly[i] <- anom
+}
+
+yield_anom <- yield_anom %>% drop_na()
+```
+
+```{r}
+check <- yield_anom %>% filter(year >= 2000 & year <= 2002)
+check
+```
+
+
+```{r}
+ggplot(data = yield_anom, aes(x = year, y = anomaly)) +
+  geom_col() +
+  theme_minimal() +
+  labs(x = "Year", y = "Yield Anomaly (tons/acre)")
+```
+
