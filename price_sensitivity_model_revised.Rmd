@@ -1,0 +1,64 @@
+---
+title: "Price Sensitivity Model"
+authors: "Almond Group F"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# Load packages
+library(tidyverse)
+library(here)
+library(purrr)
+```
+
+```{r}
+
+source(here("almond_price_fluctuation_revised.R"))
+
+#Number of random samples we want to produce. 
+n_samples = 300
+
+anomaly = rnorm(mean = 0, sd = 1, n = n_samples)
+# According to Google, the mean price per ton on almonds is 3676. As such, we chose 15% +/- that price ($551.4)
+mean_price = runif(min = 3125, 
+                   max = 4227, 
+                   n = n_samples)
+# Append our calculated values to a dataframe. 
+price_df = cbind.data.frame(anomaly, mean_price)
+```
+
+```{r}
+# For loop to create 300 random profits based on anomalies of almond yields and net average price of almonds (per ton)
+for (i in 1:n_samples) {
+  profit = almond_price_flucutation_revised(yield_anomaly = price_df$anomaly[i],
+                                    mean_almond_price = price_df$mean_price[i],
+                                    num_of_acres = 1, 
+                                    base_yield = 1)
+  price_df$profit[i] = profit
+}
+```
+
+
+```{r}
+almond_price_chart = ggplot(data = price_df, aes(x = anomaly, y = profit, color = profit)) + geom_point() +
+  scale_color_continuous(low="red", high="blue") +
+    theme_minimal() +
+  labs(title = "Estimated Profit Variance Based on Almond Yield Anomaly",
+       x = "Anomaly", 
+       y = "Profit Variance",
+       caption = "Profit Variance is based on the number of acres provided and a +/- 15% price per average ton of almonds.") 
+```
+
+```{r}
+almond_price_chart
+```
+```{r}
+ggsave("almond_price_sensitivity.png", almond_price_chart)
+```
+
+
+
