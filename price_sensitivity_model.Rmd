@@ -13,16 +13,16 @@ library(tidyverse)
 library(here)
 library(purrr)
 ```
+
 ```{r}
 
 source(here("almond_price_fluctuation.R"))
+
 n_samples = 300
 
-anomaly = runif(min = -1, 
-                max = 2000,
-                n = n_samples)
-mean_price = runif(min = 6000, 
-                   max = 8000, 
+anomaly = rnorm(mean = 0, sd = 1, n = n_samples)
+mean_price = runif(min = 1800, 
+                   max = 4200, 
                    n = n_samples)
 
 price_df = cbind.data.frame(anomaly, mean_price)
@@ -38,7 +38,7 @@ for (i in 1:n_samples) {
 ```
 O
 ```{r}
-ggplot(data = price_df, aes(x = anomaly, y = profit)) + geom_line()
+ggplot(data = price_df, aes(x = anomaly, y = profit)) + geom_point()
 ```
 
 
