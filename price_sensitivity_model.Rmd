@@ -1,0 +1,48 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# Load packages
+library(tidyverse)
+library(here)
+library(purrr)
+```
+```{r}
+n_samples = 300
+
+anomaly = runif(min = -1, 
+                max = 2000,
+                n = n_samples)
+mean_price = runif(min = 1, 
+                   max = 3, 
+                   n = n_samples)
+
+price_df = cbind.data.frame(anomaly, mean_price)
+```
+
+```{r}
+
+for (i in 1:nsamples) {
+  profit = almond_price_flucutation(yield_anomaly = price_df$anomaly[i],
+                                    mean_almond_price = price_df$mean_price[i])
+  price_df$profit[i] = profit
+}
+```
+O
+```{r}
+ggplot(data = price_df, aes(x = anomaly, y = profit)) + geom_line()
+```
+
+
+```{r}
+almond_price = price_df %>%  pmap(.f  = almond_price_flucutation,
+yield_anomaly = anomaly, 
+mean_price = mean_price)
+```
+
