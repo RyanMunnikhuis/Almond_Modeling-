@@ -36,7 +36,9 @@ price_df = cbind.data.frame(anomaly, mean_price)
 for (i in 1:n_samples) {
   profit = almond_price_flucutation_revised(yield_anomaly = price_df$anomaly[i],
                                     mean_almond_price = price_df$mean_price[i],
+                                    # Change based on number of acres
                                     num_of_acres = 1, 
+                                    # Change based on average yield of almonds per acre
                                     base_yield = 1)
   price_df$profit[i] = profit
 }
@@ -50,7 +52,7 @@ almond_price_chart = ggplot(data = price_df, aes(x = anomaly, y = profit, color 
   labs(title = "Estimated Profit Variance Based on Almond Yield Anomaly",
        x = "Anomaly", 
        y = "Profit Variance",
-       caption = "Profit Variance is based on the number of acres provided and a +/- 15% price per average ton of almonds.") 
+       caption = "Variance is based on the number of acres provided and price per average ton of almonds.") 
 ```
 
 ```{r}
